@@ -27,8 +27,10 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
+           - name: Install dependencies
+        run: |
+          npm cache clean --force
+          npm install --no-audit --no-fund
 
       - name: Build website
         run: npm run build -- --base=/MotuAndLadduBirthdayWebsite/
