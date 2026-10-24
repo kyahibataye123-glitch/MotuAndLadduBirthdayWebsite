@@ -57,78 +57,13 @@ const updateMediaSources = (node: Node) => {
   })
 }
 
-const birthdayAt = new Date("2026-10-31T00:01:00+05:30").getTime()
-const giftRevealSong = new Audio(assetUrl("audio/song-1.mp3"))
-giftRevealSong.preload = "auto"
-let countdownSkipped = false
-
 const rootElement = document.getElementById("root")!
-
-const continueFromCountdown = () => {
-  countdownSkipped = true
-  rootElement
-    .querySelector<HTMLButtonElement>(".page-garden .bottom-nav .nav-primary")
-    ?.click()
-}
-
-const updateCountdown = () => {
-  const countdownPage = rootElement.querySelector(".page-garden")
-  if (!countdownPage || countdownSkipped) return
-
-  const distance = Math.max(0, birthdayAt - Date.now())
-  const pad = (value: number) => String(value).padStart(2, "0")
-  const values = [
-    pad(Math.floor(distance / 86400000)),
-    pad(Math.floor(distance / 3600000) % 24),
-    pad(Math.floor(distance / 60000) % 60),
-    pad(Math.floor(distance / 1000) % 60),
-  ]
-
-  countdownPage.querySelectorAll(".time-card b").forEach((element, index) => {
-    if (element.textContent !== values[index])
-      element.textContent = values[index]
-  })
-
-  countdownPage.querySelector(".config-note")?.remove()
-
-  if (!countdownPage.querySelector(".countdown-skip")) {
-    const skipButton = document.createElement("button")
-    skipButton.className = "hero-button countdown-skip"
-    skipButton.textContent = "Skip Countdown →"
-    skipButton.addEventListener("click", continueFromCountdown)
-    countdownPage.querySelector(".content")?.append(skipButton)
-  }
-
-  if (distance === 0) continueFromCountdown()
-}
-
-const syncActivePage = () => {
-  updateCountdown()
-  if (rootElement.querySelector(".page-celebrate")) {
-    giftRevealSong.pause()
-    giftRevealSong.currentTime = 0
-  }
-}
-
-rootElement.addEventListener("click", (event) => {
-  const target = event.target instanceof Element ? event.target : null
-  const gift = target?.closest(".page-burgundy .gift")
-  const openGiftButton = target?.closest<HTMLButtonElement>(
-    ".page-burgundy .hero-button",
-  )
-  if (gift || openGiftButton?.textContent?.includes("Open Your Gift")) {
-    if (giftRevealSong.paused) void giftRevealSong.play()
-  }
-})
 
 new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {
     mutation.addedNodes.forEach(updateMediaSources)
   })
-  syncActivePage()
 }).observe(rootElement, { childList: true, subtree: true })
-
-window.setInterval(updateCountdown, 1000)
 
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>

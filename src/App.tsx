@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 
 // Personalize these values when the date, answer key, password, or MP3 are confirmed.
-const BIRTHDAY_AT = "" // Example format: 2027-03-14T00:00:00+05:30
+const BIRTHDAY_AT = "2026-10-31T00:01:00+05:30"
 const SECRET_PASSWORD = "motu"
 const SONGS = [
   { title: "The One That Reminds Me of You", src: "/audio/song-1.m4a" },
@@ -312,6 +312,19 @@ export default function App() {
   })
   const [playingSong, setPlayingSong] = useState<number | null>(null)
   const songRefs = useRef<(HTMLAudioElement | null)[]>([])
+  const giftRevealRef = useRef<HTMLAudioElement | null>(null)
+  const previousPageRef = useRef(page)
+
+  const openGift = () => {
+    setGiftOpen(true)
+    if (!giftRevealRef.current) {
+      giftRevealRef.current = new Audio(
+        `${import.meta.env.BASE_URL}audio/gift-reveal.m4a`,
+      )
+      giftRevealRef.current.preload = "auto"
+    }
+    void giftRevealRef.current.play()
+  }
 
   const go = (n: number) => {
     setPage(Math.max(1, Math.min(14, n)))
@@ -349,6 +362,21 @@ export default function App() {
   useEffect(() => {
     if (page === 4 && countdown.reached) setPage(5)
   }, [countdown.reached, page])
+
+  useEffect(() => {
+    if (previousPageRef.current === 5 && page !== 5) {
+      giftRevealRef.current?.pause()
+      if (giftRevealRef.current) giftRevealRef.current.currentTime = 0
+    }
+    previousPageRef.current = page
+  }, [page])
+
+  useEffect(
+    () => () => {
+      giftRevealRef.current?.pause()
+    },
+    [],
+  )
 
   const filteredMemories = useMemo(
     () =>
@@ -401,7 +429,7 @@ export default function App() {
         </p>
         <button
           className={`gift ${giftOpen ? "open" : ""}`}
-          onClick={() => setGiftOpen(true)}
+          onClick={openGift}
           aria-label="Open gift"
         >
           <span className="gift-lid">✦</span>
@@ -420,7 +448,7 @@ export default function App() {
           </p>
         </div>
         {!giftOpen ? (
-          <button className="hero-button" onClick={() => setGiftOpen(true)}>
+          <button className="hero-button" onClick={openGift}>
             🎁 Open Your Gift
           </button>
         ) : (
@@ -489,6 +517,9 @@ export default function App() {
         <p className="whisper">
           Good things take time… aur tu toh waise bhi thodi special hai. 🥹❤️
         </p>
+        <button className="hero-button countdown-skip" onClick={next}>
+          Skip Countdown →
+        </button>
       </PageShell>
     )
   else if (page === 5)
