@@ -1,0 +1,10 @@
+{
+  "description": "A personal birthday scrapbook for Motu from Laddu, featuring shared memories, an interactive quiz, music, a heartfelt letter, and celebratory surprises.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
