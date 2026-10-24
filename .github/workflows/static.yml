@@ -27,13 +27,16 @@ jobs:
         with:
           node-version: 20
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Install dependencies
-        run: |
-          npm cache clean --force
-          npm install --no-audit --no-fund
+        run: pnpm install --no-frozen-lockfile
 
       - name: Build website
-        run: npm run build -- --base=/MotuAndLadduBirthdayWebsite/
+        run: pnpm run build -- --base=/MotuAndLadduBirthdayWebsite/
 
       - name: Upload website build
         uses: actions/upload-pages-artifact@v3
